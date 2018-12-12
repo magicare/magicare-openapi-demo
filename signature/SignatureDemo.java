@@ -1,4 +1,5 @@
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -60,8 +61,10 @@ public class SignatureDemo {
 		String signatureMethod = "HMAC-SHA1";
 		String signatureNonce = UUID.randomUUID().toString();
 		String signatureVersion = "1.0";
-		// GET请求示例：uri = "/v1/olds?mobile=18612345678&order=asc&order_by=old_id&page=1&page_size=50"
-		String uri = "/v1/olds"; 
+		// GET请求
+		// String uri = "/v1/olds?name=" + URLEncoder.encode("冯大爷", "utf-8") + "&order=asc&order_by=old_id&page=1&page_size=50"; 
+		// POST请求
+		String uri = "/v1/olds";
 
 		String stringToSign = verb + "\n"
 			+ (verb.equals("POST") || verb.equals("PUT") ? contentMd5 + "\n" + contentType + "\n" : "")

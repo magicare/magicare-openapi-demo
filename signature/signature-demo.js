@@ -61,7 +61,9 @@ const host = '***.***.***';
 const signatureMethod = 'HMAC-SHA1';
 const signatureNonce = _uuid();
 const signatureVersion = '1.0';
-// GET请求示例：uri = '/v1/olds?mobile=18612345678&order=asc&order_by=old_id&page=1&page_size=50'
+// GET请求
+// const uri = '/v1/olds?name=' + encodeURIComponent('冯大爷') + '&order=asc&order_by=old_id&page=1&page_size=50'
+// POST请求
 const uri = '/v1/olds';
 
 let stringToSign = verb + '\n'

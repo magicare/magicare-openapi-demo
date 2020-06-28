@@ -6,6 +6,7 @@ import base64
 import uuid
 import datetime
 import http.client
+import textwrap
 
 # 配置
 appid = "yDRMOnjqx9mqZVjC"  # 麦麦提供
@@ -38,23 +39,25 @@ def get_http_headers(path, method, body=""):
     headers["x-signature-nonce"] = str(uuid.uuid1())
 
     if method == "POST":
-        signature_tpl = '''{method}
-{content_md5}
-{content_type}
-{date}
-{host}
-{signature_method}
-{signature_nonce}
-{signature_version}
-{path}'''
+        signature_tpl = textwrap.dedent('''\
+            {method}
+            {content_md5}
+            {content_type}
+            {date}
+            {host}
+            {signature_method}
+            {signature_nonce}
+            {signature_version}
+            {path}''')
     else:
-        signature_tpl = '''{method}
-{date}
-{host}
-{signature_method}
-{signature_nonce}
-{signature_version}
-{path}'''
+        signature_tpl = textwrap.dedent('''\
+            {method}
+            {date}
+            {host}
+            {signature_method}
+            {signature_nonce}
+            {signature_version}
+            {path}''')
 
     signature_str = signature_tpl.format(method=method, content_md5=headers["Content-MD5"], content_type=headers["Content-Type"], date=headers["Date"], host=host,
                                          signature_method=headers["x-signature-method"], signature_nonce=headers["x-signature-nonce"], signature_version=headers["x-signature-version"], path=path)
@@ -71,33 +74,33 @@ def get_http_headers(path, method, body=""):
 def test_api(path, method, body=""):
     headers = get_http_headers(path, method, body)
     # 生成 curl
-    test_curl = '''
-curl "http://{host}{path}" \\
-    -X {method} \\
-    -H "Host: {host}" \\
-    -H "Content-Type: {contentType}" \\
-    -H "Content-MD5: {contentMD5}" \\
-    -H "Authorization: {authorization}" \\
-    -H "Date: {date}" \\
-    -H "x-signature-method: {signMethod}" \\
-    -H "x-signature-nonce: {signNonce}" \\
-    -H "x-signature-version: {signVersion}" \\
-    --compressed \\
-    --insecure \\
-    -d '{data}'
-'''.format(path=path, method=method, host=host, contentType=headers["Content-Type"], contentMD5=headers["Content-MD5"], authorization=headers["Authorization"], date=headers["Date"], signMethod=headers["x-signature-method"], signNonce=headers["x-signature-nonce"], signVersion=headers["x-signature-version"], data=body)
+    test_curl = textwrap.dedent('''\
+        curl "http://{host}{path}" \\
+        -X {method} \\
+        -H "Host: {host}" \\
+        -H "Content-Type: {contentType}" \\
+        -H "Content-MD5: {contentMD5}" \\
+        -H "Authorization: {authorization}" \\
+        -H "Date: {date}" \\
+        -H "x-signature-method: {signMethod}" \\
+        -H "x-signature-nonce: {signNonce}" \\
+        -H "x-signature-version: {signVersion}" \\
+        --compressed \\
+        --insecure \\
+        -d '{data}'
+    ''').format(path=path, method=method, host=host, contentType=headers["Content-Type"], contentMD5=headers["Content-MD5"], authorization=headers["Authorization"], date=headers["Date"], signMethod=headers["x-signature-method"], signNonce=headers["x-signature-nonce"], signVersion=headers["x-signature-version"], data=body)
 
     print("\n========================================")
 
-    print("\nFYI, this is the `curl` command below...")
+    print("\nFYI, this is the `curl` command below...\n")
     print(test_curl)
 
     print("\n And then, send the request using http.client...\n")
     conn = http.client.HTTPConnection(host)
     conn.request(method=method, url=path, body=body, headers=headers)
     res = conn.getresponse()
-    res_j = res.read().decode()
-    print(res_j)
+    result = res.read().decode()
+    print(result)
 
     print("\n========================================")
 
